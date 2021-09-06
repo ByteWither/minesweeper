@@ -3,7 +3,7 @@ const path = require('path');
 module.exports = () => {
     return {
         entry: {
-            main: path.resolve(__dirname, './src/index.ts'),
+            main: path.resolve(__dirname, './src/App/index.tsx'),
         },
         module: {
             rules: [
