@@ -1,9 +1,7 @@
-function Field() {
-    return (<button></button>)
-    
-}
+import React from "react"
+import Field from "./App"
 
-function Board() {
+export function Board() {
     return (
         <div className="board">
             for (let i: number = 0; i < 10; i++) {
@@ -16,5 +14,3 @@ function Board() {
         </div>
     )
 }
-
-export default Board;
