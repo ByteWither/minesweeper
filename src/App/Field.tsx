@@ -1,5 +1,5 @@
 import React from "react"
 
-export function Field() {
-    return <button>{j}</button>
+export function Field({ value }) {
+    return <button>{value}</button>
 }
