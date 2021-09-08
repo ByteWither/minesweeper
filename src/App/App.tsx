@@ -1,8 +1,6 @@
 import React from "react"
-import Board from "./App"
+import { Board } from "./Board"
 
-function App() {
+export function App() {
     return <Board />
 }
-
-export default App
