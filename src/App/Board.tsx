@@ -4,7 +4,7 @@ import { Field } from "./Field"
 function boardRow(i: number) {
     const fields = []
     for (let j: number = 0; j < 10; j++) {
-        fields.push(<Field key={j.toString()} x={j} y={i}></Field>)
+        fields.push(<Field key={j.toString()} value="" x={j} y={i}></Field>)
     }
     return fields
 }
