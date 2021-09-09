@@ -9,14 +9,14 @@ function boardRow() {
     return fields
 }
 
-// function fields() {
-//     const rows = []
-//     for (let i: number = 0; i < 10; i++) {
-//         rows.push(<div className="board-row">{}</div>)
-//     }
-//     return rows
-// }
+function fields() {
+    const rows = []
+    for (let i: number = 0; i < 10; i++) {
+        rows.push(<div className="board-row">{boardRow()}</div>)
+    }
+    return rows
+}
 
 export function Board() {
-    return <div className="board">{boardRow()}</div>
+    return <div className="board">{fields()}</div>
 }
