@@ -1,25 +1,25 @@
-import React from "react"
+import React, { useState } from "react"
 
 export interface StandardComponentProps {
-    value: string
     x: number
     y: number
 }
 
-export function Field({ value, x, y }: StandardComponentProps) {
+export function Field({ x, y }: StandardComponentProps) {
+    const [click, setClick] = useState({ value: "" })
+
     function leftClick() {
-        console.log("left!")
-        return (value = "left")
+        setClick({ value: "left!" })
     }
 
     function rightClick(e: React.MouseEvent) {
         e.preventDefault()
-        console.log("right!")
-        return (value = "right")
+        setClick({ value: "🚩" })
     }
+
     return (
         <button onClick={leftClick} onContextMenu={rightClick}>
-            {value}!{x}
+            {click.value} !{x}
             {y}!
         </button>
     )
