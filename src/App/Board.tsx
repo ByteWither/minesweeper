@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState, useEffect } from "react"
 import { Field } from "./Field"
 
 function boardRow(i: number) {
@@ -17,6 +17,25 @@ function fields() {
     return rows
 }
 
+function generateBoard() {
+    console.log("Board generated!")
+}
+
 export function Board() {
-    return <div className="board">{fields()}</div>
+    const [generateBoards, setGenerateBoards] = useState(0)
+
+    useEffect(() => {
+        if (generateBoards === 1) {
+            generateBoard()
+        }
+        // return () => {
+        //     cleanup
+        // }
+    })
+
+    return (
+        <div onClick={() => setGenerateBoards(generateBoards + 1)} className="board">
+            {fields()}
+        </div>
+    )
 }
