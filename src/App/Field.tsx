@@ -1,9 +1,15 @@
 import React from "react"
 
 export interface StandardComponentProps {
-    value: number
+    x: number
+    y: number
 }
 
-export function Field({ value }: StandardComponentProps) {
-    return <button>{value}</button>
+export function Field({ x, y }: StandardComponentProps) {
+    return (
+        <button>
+            {x}
+            {y}
+        </button>
+    )
 }
