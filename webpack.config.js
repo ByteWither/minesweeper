@@ -1,42 +1,53 @@
-const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
+const path = require("path")
+const HtmlWebpackPlugin = require("html-webpack-plugin")
 
 module.exports = () => {
     return {
         entry: {
-            main: path.resolve(__dirname, './src/App/index.tsx'),
+            main: path.resolve(__dirname, "./src/App/index.tsx"),
         },
         module: {
             rules: [
                 {
                     test: /\.ts(x?)$/,
-                    use: 'ts-loader',
+                    use: "ts-loader",
                     exclude: /[\\/]node_modules[\\/]/,
+                },
+                {
+                    test: /\.s[ac]ss$/i,
+                    use: [
+                        // Creates `style` nodes from JS strings
+                        "style-loader",
+                        // Translates CSS into CommonJS
+                        "css-loader",
+                        // Compiles Sass to CSS
+                        "sass-loader",
+                    ],
                 },
             ],
         },
         devServer: {
             static: {
-                directory: path.resolve(__dirname, './dist'),
+                directory: path.resolve(__dirname, "./dist"),
             },
             port: 4200,
             open: true,
         },
         plugins: [
             new HtmlWebpackPlugin({
-                template: path.resolve(__dirname, './src/App/index.html'),
+                template: path.resolve(__dirname, "./src/App/index.html"),
             }),
         ],
         resolve: {
-            extensions: ['.tsx', '.ts', '.jsx', '.js'],
+            extensions: [".tsx", ".ts", ".jsx", ".js"],
         },
         output: {
-            path: path.resolve(__dirname, './dist'),
-            publicPath: '/',
+            path: path.resolve(__dirname, "./dist"),
+            publicPath: "/",
         },
         performance: {
             hints: false,
         },
-        stats: 'errors-warnings',
-    };
-};
+        stats: "errors-warnings",
+    }
+}
