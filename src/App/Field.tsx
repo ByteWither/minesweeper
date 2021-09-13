@@ -1,32 +1,45 @@
-import React, { useState } from "react"
+import React from "react"
 
-export interface StandardComponentProps {
+export type States = "bomb" | "flag" | "opened"
+type FieldProps = {
     x: number
     y: number
-    hasBomb?: boolean
-    isOpen?: boolean
-    hasFlag?: boolean
+    state: States
+    leftClick: (x: number, y: number) => void
+    rightClick: (x: number, y: number) => void
 }
 
-export function Field({ x, y }: StandardComponentProps) {
-    const [click, setClick] = useState({ value: "" })
-    const [hasFlag, setHasFlag] = useState({ hasFlag: false })
+export function Field({ x, y, state, leftClick, rightClick }: FieldProps) {
+    const getState = () => {
+        switch (state) {
+            case "opened":
+                return "👍"
 
-    function leftClick() {
-        setClick({ value: "left!" })
+            case "flag":
+                return "🚩"
+
+            case "bomb":
+                return "💣"
+
+            default:
+                return null
+        }
     }
 
-    function rightClick(e: React.MouseEvent) {
+    const leftClickHandle = () => {
+        leftClick(x, y)
+    }
+
+    const rightClickHandle = (e: React.MouseEvent) => {
         e.preventDefault()
-        setClick({ value: "🚩" })
-        hasFlag //idk
-        setHasFlag({ hasFlag: true })
+        rightClick(x, y)
     }
 
     return (
-        <button onClick={leftClick} onContextMenu={rightClick}>
-            {click.value} !{x}
-            {y}!
+        <button onClick={leftClickHandle} onContextMenu={rightClickHandle}>
+            {getState()}
+            {x}
+            {y}
         </button>
     )
 }
