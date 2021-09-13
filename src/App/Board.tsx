@@ -1,39 +1,87 @@
-import React, { useState } from "react"
-import { Field } from "./Field"
+import React from "react"
+import { Field, States } from "./Field"
 
-// function setBomb() {}
+const ROWS = 10
+const CELLS = 10
+
+type boardItem = {
+    isMine: boolean
+    minesAround: number
+    flagged: boolean
+    opened: boolean
+}
+type board = Array<Array<boardItem>>
 
 export function Board() {
-    const [generateBoards, setGenerateBoards] = useState(0)
+    // const [firstStep, setFirstStep] = React.useState<boolean>(true)
 
-    function boardRow(i: number) {
-        // const [cords, setCords] = useState({ x: 0, y: 0 })
-        const fields = []
-        for (let j: number = 0; j < 10; j++) {
-            fields.push(<Field key={j.toString()} x={j} y={i}></Field>)
+    const [userBoard, setUserBoard] = React.useState<board>([])
+
+    const boardFill = () => {
+        const board: board = []
+        for (let r = 0; r < ROWS; r++) {
+            const rows: Array<boardItem> = []
+            for (let c = 0; c < CELLS; c++) {
+                rows.push({
+                    isMine: false,
+                    minesAround: 5,
+                    flagged: false,
+                    opened: false,
+                })
+            }
+            board.push(rows)
         }
-        return fields
+        // console.log(board)
+        setUserBoard(board)
     }
 
-    function fields() {
-        const rows = []
-        for (let i: number = 0; i < 10; i++) {
-            rows.push(<div className="board-row">{boardRow(i)}</div>)
+    React.useEffect(() => {
+        boardFill()
+    }, [])
+
+    const leftHandle = (x: number, y: number) => {
+        console.log(x, y)
+    }
+
+    const rightHandle = (x: number, y: number) => {
+        setUserBoard((prevState) => {
+            prevState[x][y].flagged = !prevState[x][y].flagged
+            return [...prevState]
+        })
+    }
+
+    const getActualState = (x: number, y: number): States => {
+        const field = userBoard[x][y]
+        if (field.flagged) {
+            return "flag"
         }
-        return rows
+        return null
     }
 
-    function generateBoard() {
-        console.log("Board generated!")
-    }
+    // const generateBoard = () => {
+    //     console.log("Board generated!")
+    // }
 
-    if (generateBoards === 1) {
-        generateBoard()
-    }
+    // if (firstStep === true) {
+    //     generateBoard()
+    // }
 
     return (
-        <div onClick={() => setGenerateBoards(generateBoards + 1)} className="board">
-            {fields()}
+        <div className="board">
+            {userBoard.map((cells, rowIndex) => (
+                <div className="board-row" key={rowIndex}>
+                    {cells.map((_cell, cellIndex) => (
+                        <Field
+                            key={"" + cellIndex + rowIndex}
+                            x={rowIndex}
+                            y={cellIndex}
+                            state={getActualState(rowIndex, cellIndex)}
+                            leftClick={leftHandle}
+                            rightClick={rightHandle}
+                        />
+                    ))}
+                </div>
+            ))}
         </div>
     )
 }
