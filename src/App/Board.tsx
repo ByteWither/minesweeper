@@ -40,22 +40,22 @@ export function Board() {
     }, [])
 
     const setMine = () => {
-        let mineCount = 5
-        for (let c = 0; c < mineCount; c++) {
-            const xMine = Math.floor(Math.random() * CELLS)
-            const yMine = Math.floor(Math.random() * ROWS)
+        setUserBoard((prevState) => {
+            let mineCount = 5
+            for (let c = 0; c < mineCount; c++) {
+                const xMine = Math.floor(Math.random() * CELLS)
+                const yMine = Math.floor(Math.random() * ROWS)
 
-            if (!userBoard[xMine][yMine].opened && !userBoard[xMine][yMine].isMine) {
-                userBoard[xMine][yMine].isMine = true
-                console.log("Mine: ", xMine, yMine)
-            } else {
-                mineCount++
+                if (!prevState[xMine][yMine].opened && !prevState[xMine][yMine].isMine) {
+                    userBoard[xMine][yMine].isMine = true
+                    console.log("Mine: ", xMine, yMine)
+                } else {
+                    mineCount++
+                }
             }
-        }
-        console.log(mineCount - 5)
-
-        console.log(userBoard)
-        return userBoard
+            console.log(mineCount - 5)
+            return prevState
+        })
     }
 
     const generateBoard = (_x: number, _y: number) => {
