@@ -39,6 +39,17 @@ export function Board() {
         boardFill()
     }, [])
 
+    const clearBoard = () => {
+        setUserBoard((prevState) => {
+            prevState.map((item) => {
+                item.map((cell) => {
+                    cell.flagged = false
+                })
+            })
+            return prevState
+        })
+    }
+
     const setMine = () => {
         setUserBoard((prevState) => {
             let mineCount = CELLS
@@ -61,6 +72,7 @@ export function Board() {
     const generateBoard = (_x: number, _y: number) => {
         console.log("Board generated!")
         // const mutateBoard = cloneDeep(userBoard)
+        clearBoard()
         setMine()
     }
 
