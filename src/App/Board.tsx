@@ -41,19 +41,19 @@ export function Board() {
 
     const setMine = () => {
         setUserBoard((prevState) => {
-            let mineCount = 5
+            let mineCount = CELLS
             for (let c = 0; c < mineCount; c++) {
                 const xMine = Math.floor(Math.random() * CELLS)
                 const yMine = Math.floor(Math.random() * ROWS)
 
-                if (!prevState[xMine][yMine].opened && !prevState[xMine][yMine].isMine) {
+                if (!userBoard[xMine][yMine].opened && !userBoard[xMine][yMine].isMine) {
                     userBoard[xMine][yMine].isMine = true
                     console.log("Mine: ", xMine, yMine)
                 } else {
                     mineCount++
                 }
             }
-            console.log(mineCount - 5)
+            console.log(mineCount - CELLS)
             return prevState
         })
     }
