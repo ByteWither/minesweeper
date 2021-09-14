@@ -45,7 +45,9 @@ export function Board() {
         setUserBoard((prevState) => {
             const mutateBoard = cloneDeep(prevState)
 
-            mutateBoard[x][y].opened = true
+            if (!mutateBoard[x][y].flagged) {
+                mutateBoard[x][y].opened = true
+            }
 
             return mutateBoard
         })
@@ -55,7 +57,9 @@ export function Board() {
         setUserBoard((prevState) => {
             const mutateBoard = cloneDeep(prevState)
 
-            mutateBoard[x][y].flagged = !mutateBoard[x][y].flagged
+            if (!mutateBoard[x][y].opened) {
+                mutateBoard[x][y].flagged = !mutateBoard[x][y].flagged
+            }
 
             return mutateBoard
         })
