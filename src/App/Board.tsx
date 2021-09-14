@@ -14,8 +14,7 @@ type boardItem = {
 type board = Array<Array<boardItem>>
 
 export function Board() {
-    // const [firstStep, setFirstStep] = React.useState<boolean>(true)
-
+    const [_firstStep, setFirstStep] = React.useState<boolean>(true)
     const [userBoard, setUserBoard] = React.useState<board>([])
 
     const boardFill = () => {
@@ -40,8 +39,34 @@ export function Board() {
         boardFill()
     }, [])
 
+    const setMine = () => {
+        let mineCount = 5
+        for (let c = 0; c < mineCount; c++) {
+            const xMine = Math.floor(Math.random() * CELLS)
+            const yMine = Math.floor(Math.random() * ROWS)
+
+            if (!userBoard[xMine][yMine].opened && !userBoard[xMine][yMine].isMine) {
+                userBoard[xMine][yMine].isMine = true
+                console.log("Mine: ", xMine, yMine)
+            } else {
+                mineCount++
+            }
+        }
+        console.log(mineCount - 5)
+
+        console.log(userBoard)
+        return userBoard
+    }
+
+    const generateBoard = (_x: number, _y: number) => {
+        console.log("Board generated!")
+        // const mutateBoard = cloneDeep(userBoard)
+        setMine()
+    }
+
     const leftHandle = (x: number, y: number) => {
         console.log(x, y)
+
         setUserBoard((prevState) => {
             const mutateBoard = cloneDeep(prevState)
 
@@ -50,6 +75,14 @@ export function Board() {
             }
 
             return mutateBoard
+        })
+
+        setFirstStep((prevState) => {
+            if (prevState) {
+                generateBoard(x, y)
+                prevState = false
+            }
+            return prevState
         })
     }
 
@@ -72,18 +105,11 @@ export function Board() {
         } else if (field.opened) {
             return "opened"
         } else if (field.isMine) {
+            console.log("Bomb!")
             return "bomb"
         }
         return null
     }
-
-    // const generateBoard = () => {
-    //     console.log("Board generated!")
-    // }
-
-    // if (firstStep === true) {
-    //     generateBoard()
-    // }
 
     return (
         <div className="board">
