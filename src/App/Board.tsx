@@ -41,6 +41,10 @@ export function Board() {
 
     const leftHandle = (x: number, y: number) => {
         console.log(x, y)
+        setUserBoard((prevState) => {
+            prevState[x][y].opened = true
+            return [...prevState]
+        })
     }
 
     const rightHandle = (x: number, y: number) => {
@@ -54,6 +58,10 @@ export function Board() {
         const field = userBoard[x][y]
         if (field.flagged) {
             return "flag"
+        } else if (field.opened) {
+            return "opened"
+        } else if (field.isMine) {
+            return "bomb"
         }
         return null
     }
