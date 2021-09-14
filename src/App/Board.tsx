@@ -1,6 +1,6 @@
 import React from "react"
 import { Field, States } from "./Field"
-import { cloneDeep } from 'lodash'
+import { cloneDeep } from "lodash"
 
 const ROWS = 10
 const CELLS = 10
@@ -46,7 +46,7 @@ export function Board() {
             const mutateBoard = cloneDeep(prevState)
 
             mutateBoard[x][y].opened = true
-            
+
             return mutateBoard
         })
     }
