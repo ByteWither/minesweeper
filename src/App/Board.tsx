@@ -1,5 +1,6 @@
 import React from "react"
 import { Field, States } from "./Field"
+import { cloneDeep } from 'lodash'
 
 const ROWS = 10
 const CELLS = 10
@@ -42,15 +43,21 @@ export function Board() {
     const leftHandle = (x: number, y: number) => {
         console.log(x, y)
         setUserBoard((prevState) => {
-            prevState[x][y].opened = true
-            return [...prevState]
+            const mutateBoard = cloneDeep(prevState)
+
+            mutateBoard[x][y].opened = true
+            
+            return mutateBoard
         })
     }
 
     const rightHandle = (x: number, y: number) => {
         setUserBoard((prevState) => {
-            prevState[x][y].flagged = !prevState[x][y].flagged
-            return [...prevState]
+            const mutateBoard = cloneDeep(prevState)
+
+            mutateBoard[x][y].flagged = !mutateBoard[x][y].flagged
+
+            return mutateBoard
         })
     }
 
