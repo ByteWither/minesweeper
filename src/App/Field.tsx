@@ -1,6 +1,6 @@
 import React from "react"
 
-export type States = "bomb" | "flag" | "opened"
+export type States = "bomb" | "flag" | "opened" | number
 type FieldProps = {
     x: number
     y: number
@@ -11,6 +11,10 @@ type FieldProps = {
 
 export function Field({ x, y, state, leftClick, rightClick }: FieldProps) {
     const getState = () => {
+        if (typeof state === "number") {
+            return "" + state
+        }
+
         switch (state) {
             case "opened":
                 return "👍"
@@ -38,8 +42,8 @@ export function Field({ x, y, state, leftClick, rightClick }: FieldProps) {
     return (
         <button onClick={leftClickHandle} onContextMenu={rightClickHandle}>
             {getState()}
-            {x}
-            {y}
+            {/* {x}
+            {y} */}
         </button>
     )
 }
