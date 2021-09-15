@@ -1,6 +1,7 @@
 import React from "react"
 import { Field, States } from "./Field"
 import { cloneDeep, toNumber } from "lodash"
+import "../Sass/blocks/board.sass"
 
 const ROWS = 10
 const CELLS = 10
@@ -112,16 +113,16 @@ export function Board() {
 
     const setCountMines = () => {
         setUserBoard((prevState) => {
-            userBoard.map((rows, rowInedx) => {
+            prevState.map((rows, rowIndex) => {
                 rows.map((cell, cellIndex) => {
-                    if (!cell.isMine) {
-                        if (!hasNeighbors(rowInedx, cellIndex)) {
-                            cell.minesAround++
-                        }
+                    if (!cell.isMine && !hasNeighbors(rowIndex, cellIndex)) {
+                        // userBoard[rowIndex][cellIndex].minesAround++
+                        cell.minesAround++
                     }
                 })
             })
 
+            console.log(prevState)
             return prevState
         })
     }
@@ -131,7 +132,6 @@ export function Board() {
         clearBoard()
         setMine(x, y)
         setCountMines()
-        console.log(userBoard)
     }
 
     const leftHandle = (x: number, y: number) => {
