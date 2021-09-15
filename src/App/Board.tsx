@@ -50,7 +50,20 @@ export function Board() {
         })
     }
 
-    const setMine = () => {
+    const hasNeighbors = (x: number, y: number) => {
+        return (
+            !userBoard[x][y + 1].isMine &&
+            !userBoard[x + 1][y + 1].isMine &&
+            !userBoard[x + 1][y].isMine &&
+            !userBoard[x + 1][y - 1].isMine &&
+            !userBoard[x][y - 1].isMine &&
+            !userBoard[x - 1][y - 1].isMine &&
+            !userBoard[x - 1][y].isMine &&
+            !userBoard[x - 1][y + 1].isMine
+        )
+    }
+
+    const setMine = (x: number, y: number) => {
         setUserBoard((prevState) => {
             let mineCount = CELLS
             for (let c = 0; c < mineCount; c++) {
@@ -60,20 +73,23 @@ export function Board() {
                 if (!userBoard[xMine][yMine].opened && !userBoard[xMine][yMine].isMine) {
                     userBoard[xMine][yMine].isMine = true
                     console.log("Mine: ", xMine, yMine)
+
+                    if (!hasNeighbors(x, y)) {
+                        userBoard[xMine][yMine].isMine = false
+                        mineCount++
+                    }
                 } else {
                     mineCount++
                 }
             }
-            console.log(mineCount - CELLS)
             return prevState
         })
     }
 
-    const generateBoard = (_x: number, _y: number) => {
+    const generateBoard = (x: number, y: number) => {
         console.log("Board generated!")
-        // const mutateBoard = cloneDeep(userBoard)
         clearBoard()
-        setMine()
+        setMine(x, y)
     }
 
     const leftHandle = (x: number, y: number) => {
@@ -129,7 +145,7 @@ export function Board() {
                 <div className="board-row" key={rowIndex}>
                     {cells.map((_cell, cellIndex) => (
                         <Field
-                            key={"" + cellIndex + rowIndex}
+                            key={"" + rowIndex + cellIndex}
                             x={rowIndex}
                             y={cellIndex}
                             state={getActualState(rowIndex, cellIndex)}
