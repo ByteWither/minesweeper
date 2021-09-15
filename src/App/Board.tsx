@@ -24,7 +24,7 @@ export function Board() {
             for (let c = 0; c < CELLS; c++) {
                 rows.push({
                     isMine: false,
-                    minesAround: 5,
+                    minesAround: 0,
                     flagged: false,
                     opened: false,
                 })
@@ -110,14 +110,37 @@ export function Board() {
         })
     }
 
+    const setCountMines = () => {
+        setUserBoard((prevState) => {
+            userBoard.map((rows, rowInedx) => {
+                rows.map((cell, cellIndex) => {
+                    if (!cell.isMine) {
+                        if (!hasNeighbors(rowInedx, cellIndex)) {
+                            cell.minesAround++
+                        }
+                    }
+                })
+            })
+
+            return prevState
+        })
+    }
+
     const generateBoard = (x: number, y: number) => {
         console.log("Board generated!")
         clearBoard()
         setMine(x, y)
+        setCountMines()
+        console.log(userBoard)
     }
 
     const leftHandle = (x: number, y: number) => {
         console.log(x, y)
+
+        //test
+        if (userBoard[x][y].isMine) {
+            console.log("You lose")
+        }
 
         setUserBoard((prevState) => {
             const mutateBoard = cloneDeep(prevState)
@@ -157,8 +180,9 @@ export function Board() {
         } else if (field.opened) {
             return "opened"
         } else if (field.isMine) {
-            console.log("Bomb!")
             return "bomb"
+        } else if (field.minesAround) {
+            return field.minesAround
         }
         return null
     }
