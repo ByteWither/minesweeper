@@ -1,4 +1,5 @@
 import React from "react"
+import "../Sass/components/field.sass"
 
 export type States = "bomb" | "flag" | "opened" | number
 type FieldProps = {
@@ -40,7 +41,7 @@ export function Field({ x, y, state, leftClick, rightClick }: FieldProps) {
     }
 
     return (
-        <button onClick={leftClickHandle} onContextMenu={rightClickHandle}>
+        <button className="field" onClick={leftClickHandle} onContextMenu={rightClickHandle}>
             {getState()}
             {/* {x}
             {y} */}
