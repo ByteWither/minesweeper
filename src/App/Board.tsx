@@ -1,6 +1,6 @@
 import React from "react"
 import { Field, States } from "./Field"
-import { cloneDeep } from "lodash"
+import { cloneDeep, toNumber } from "lodash"
 
 const ROWS = 10
 const CELLS = 10
@@ -31,7 +31,6 @@ export function Board() {
             }
             board.push(rows)
         }
-        // console.log(board)
         setUserBoard(board)
     }
 
@@ -51,16 +50,41 @@ export function Board() {
     }
 
     const hasNeighbors = (x: number, y: number) => {
-        return (
-            !userBoard[x][y + 1].isMine &&
-            !userBoard[x + 1][y + 1].isMine &&
-            !userBoard[x + 1][y].isMine &&
-            !userBoard[x + 1][y - 1].isMine &&
-            !userBoard[x][y - 1].isMine &&
-            !userBoard[x - 1][y - 1].isMine &&
-            !userBoard[x - 1][y].isMine &&
-            !userBoard[x - 1][y + 1].isMine
-        )
+        const neighbors = []
+
+        // ничего более изящного я пока не придумал :(
+        if (userBoard[x][y + 1]) {
+            neighbors.push(!userBoard[x][y + 1].isMine)
+        }
+        if (userBoard[x + 1] && userBoard[x + 1][y + 1]) {
+            neighbors.push(!userBoard[x + 1][y + 1].isMine)
+        }
+        if (userBoard[x + 1] && userBoard[x + 1][y]) {
+            neighbors.push(!userBoard[x + 1][y].isMine)
+        }
+        if (userBoard[x + 1] && userBoard[x + 1][y - 1]) {
+            neighbors.push(!userBoard[x + 1][y - 1].isMine)
+        }
+        if (userBoard[x][y - 1]) {
+            neighbors.push(!userBoard[x][y - 1].isMine)
+        }
+        if (userBoard[x - 1] && userBoard[x - 1][y - 1]) {
+            neighbors.push(!userBoard[x - 1][y - 1].isMine)
+        }
+        if (userBoard[x - 1] && userBoard[x - 1][y]) {
+            neighbors.push(!userBoard[x - 1][y].isMine)
+        }
+        if (userBoard[x - 1] && userBoard[x - 1][y + 1]) {
+            neighbors.push(!userBoard[x - 1][y + 1].isMine)
+        }
+
+        let result = 1
+
+        neighbors.map((cell) => {
+            result *= toNumber(cell)
+        })
+
+        return result
     }
 
     const setMine = (x: number, y: number) => {
