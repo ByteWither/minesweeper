@@ -1,6 +1,6 @@
 import React from "react"
 import { Field, States } from "./Field"
-import { cloneDeep, toNumber } from "lodash"
+import { cloneDeep } from "lodash"
 import "../Sass/blocks/board.sass"
 
 const ROWS = 10
@@ -14,8 +14,47 @@ type boardItem = {
 }
 type board = Array<Array<boardItem>>
 
+const generateMine = (cellsCount: number, rowsCount: number): [number, number] => {
+    return [Math.floor(Math.random() * cellsCount), Math.floor(Math.random() * rowsCount)]
+}
+
+const setMinesAroundCount = (board: board, x: number, y: number) => {
+    //top
+    if (board?.[x]?.[y - 1]) {
+        board[x][y - 1].minesAround++
+    }
+    // topRight
+    if (board?.[x + 1]?.[y - 1]) {
+        board[x + 1][y - 1].minesAround++
+    }
+    //right
+    if (board?.[x + 1]?.[y]) {
+        board[x + 1][y].minesAround++
+    }
+    // bottom right
+    if (board?.[x + 1]?.[y + 1]) {
+        board[x + 1][y + 1].minesAround++
+    }
+    // bottom
+    if (board?.[x]?.[y + 1]) {
+        board[x][y + 1].minesAround++
+    }
+    //bottom left
+    if (board?.[x - 1]?.[y + 1]) {
+        board[x - 1][y + 1].minesAround++
+    }
+    //left
+    if (board?.[x - 1]?.[y]) {
+        board[x - 1][y].minesAround++
+    }
+    //top left
+    if (board?.[x - 1]?.[y - 1]) {
+        board[x - 1][y - 1].minesAround++
+    }
+}
+
 export function Board() {
-    const [_firstStep, setFirstStep] = React.useState<boolean>(true)
+    const firstStep = React.useRef<boolean>(true)
     const [userBoard, setUserBoard] = React.useState<board>([])
 
     const boardFill = () => {
@@ -50,115 +89,41 @@ export function Board() {
         })
     }
 
-    const hasNeighbors = (x: number, y: number) => {
-        const neighbors = []
-
-        // ничего более изящного я пока не придумал :(
-        if (userBoard[x][y + 1]) {
-            neighbors.push(!userBoard[x][y + 1].isMine)
-        }
-        if (userBoard[x + 1] && userBoard[x + 1][y + 1]) {
-            neighbors.push(!userBoard[x + 1][y + 1].isMine)
-        }
-        if (userBoard[x + 1] && userBoard[x + 1][y]) {
-            neighbors.push(!userBoard[x + 1][y].isMine)
-        }
-        if (userBoard[x + 1] && userBoard[x + 1][y - 1]) {
-            neighbors.push(!userBoard[x + 1][y - 1].isMine)
-        }
-        if (userBoard[x][y - 1]) {
-            neighbors.push(!userBoard[x][y - 1].isMine)
-        }
-        if (userBoard[x - 1] && userBoard[x - 1][y - 1]) {
-            neighbors.push(!userBoard[x - 1][y - 1].isMine)
-        }
-        if (userBoard[x - 1] && userBoard[x - 1][y]) {
-            neighbors.push(!userBoard[x - 1][y].isMine)
-        }
-        if (userBoard[x - 1] && userBoard[x - 1][y + 1]) {
-            neighbors.push(!userBoard[x - 1][y + 1].isMine)
-        }
-
-        let result = 1
-
-        neighbors.map((cell) => {
-            result *= toNumber(cell)
-        })
-
-        return result
-    }
-
-    const setMine = (x: number, y: number) => {
-        setUserBoard((prevState) => {
-            let mineCount = CELLS
-            for (let c = 0; c < mineCount; c++) {
-                const xMine = Math.floor(Math.random() * CELLS)
-                const yMine = Math.floor(Math.random() * ROWS)
-
-                if (!userBoard[xMine][yMine].opened && !userBoard[xMine][yMine].isMine) {
-                    userBoard[xMine][yMine].isMine = true
-                    console.log("Mine: ", xMine, yMine)
-
-                    if (!hasNeighbors(x, y)) {
-                        userBoard[xMine][yMine].isMine = false
-                        mineCount++
-                    }
-                } else {
-                    mineCount++
-                }
-            }
-            return prevState
-        })
-    }
-
-    const setCountMines = () => {
-        setUserBoard((prevState) => {
-            prevState.map((rows, rowIndex) => {
-                rows.map((cell, cellIndex) => {
-                    if (!cell.isMine && !hasNeighbors(rowIndex, cellIndex)) {
-                        // userBoard[rowIndex][cellIndex].minesAround++
-                        cell.minesAround++
-                    }
-                })
-            })
-
-            console.log(prevState)
-            return prevState
-        })
-    }
-
-    const generateBoard = (x: number, y: number) => {
-        console.log("Board generated!")
+    const setMines = (excludeX: number, excludeY: number) => {
         clearBoard()
-        setMine(x, y)
-        setCountMines()
-    }
+        let minesCount = 10
+        const minesData: Array<[number, number]> = []
 
-    const leftHandle = (x: number, y: number) => {
-        console.log(x, y)
+        while (minesCount > 0) {
+            const mine = generateMine(CELLS, ROWS)
 
-        //test
-        if (userBoard[x][y].isMine) {
-            console.log("You lose")
+            if (
+                mine[0] !== excludeX &&
+                mine[1] !== excludeY &&
+                !minesData.some((existMine) => existMine[0] === mine[0] && existMine[1] === mine[1])
+            ) {
+                minesData.push(mine)
+                minesCount--
+            }
         }
 
         setUserBoard((prevState) => {
             const mutateBoard = cloneDeep(prevState)
 
-            if (!mutateBoard[x][y].flagged) {
-                mutateBoard[x][y].opened = true
-            }
+            minesData.forEach(([mineX, mineY]) => {
+                mutateBoard[mineX][mineY].isMine = true
+                setMinesAroundCount(mutateBoard, mineX, mineY)
+            })
 
             return mutateBoard
         })
+    }
 
-        setFirstStep((prevState) => {
-            if (prevState) {
-                generateBoard(x, y)
-                prevState = false
-            }
-            return prevState
-        })
+    const leftHandle = (x: number, y: number) => {
+        if (firstStep.current) {
+            setMines(x, y)
+            firstStep.current = false
+        }
     }
 
     const rightHandle = (x: number, y: number) => {
