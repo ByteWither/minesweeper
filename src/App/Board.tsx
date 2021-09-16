@@ -19,38 +19,96 @@ const generateMine = (cellsCount: number, rowsCount: number): [number, number] =
 }
 
 const setMinesAroundCount = (board: board, x: number, y: number) => {
-    //top
-    if (board?.[x]?.[y - 1]) {
-        board[x][y - 1].minesAround++
+    for (let i = -1; i <= 1; i++) {
+        for (let j = -1; j <= 1; j++) {
+            if (board?.[x + j]?.[y + i]) {
+                board[x + j][y + i].minesAround++
+            }
+        }
     }
-    // topRight
-    if (board?.[x + 1]?.[y - 1]) {
-        board[x + 1][y - 1].minesAround++
+
+    // //top
+    // if (board?.[x]?.[y - 1]) {
+    //     board[x][y - 1].minesAround++
+    // }
+    // // topRight
+    // if (board?.[x + 1]?.[y - 1]) {
+    //     board[x + 1][y - 1].minesAround++
+    // }
+    // //right
+    // if (board?.[x + 1]?.[y]) {
+    //     board[x + 1][y].minesAround++
+    // }
+    // // bottom right
+    // if (board?.[x + 1]?.[y + 1]) {
+    //     board[x + 1][y + 1].minesAround++
+    // }
+    // // bottom
+    // if (board?.[x]?.[y + 1]) {
+    //     board[x][y + 1].minesAround++
+    // }
+    // //bottom left
+    // if (board?.[x - 1]?.[y + 1]) {
+    //     board[x - 1][y + 1].minesAround++
+    // }
+    // //left
+    // if (board?.[x - 1]?.[y]) {
+    //     board[x - 1][y].minesAround++
+    // }
+    // //top left
+    // if (board?.[x - 1]?.[y - 1]) {
+    //     board[x - 1][y - 1].minesAround++
+    // }
+}
+
+const firstOpening = (board: board, x: number, y: number) => {
+    for (let i = -1; i <= 1; i++) {
+        for (let j = -1; j <= 1; j++) {
+            if (board?.[x + j]?.[y + i] && !board?.[x + j]?.[y + i].opened) {
+                console.log(board[x + j][y + i].minesAround)
+                if (board[x + j][y + i].minesAround > 0) {
+                    let minesCount = board[x + j][y + i].minesAround
+                    board[x + j][y + i].opened = true
+                    board[x + j][y + i].minesAround = minesCount
+                } else {
+                    board[x + j][y + i].opened = true
+                }
+            }
+        }
     }
-    //right
-    if (board?.[x + 1]?.[y]) {
-        board[x + 1][y].minesAround++
-    }
-    // bottom right
-    if (board?.[x + 1]?.[y + 1]) {
-        board[x + 1][y + 1].minesAround++
-    }
-    // bottom
-    if (board?.[x]?.[y + 1]) {
-        board[x][y + 1].minesAround++
-    }
-    //bottom left
-    if (board?.[x - 1]?.[y + 1]) {
-        board[x - 1][y + 1].minesAround++
-    }
-    //left
-    if (board?.[x - 1]?.[y]) {
-        board[x - 1][y].minesAround++
-    }
-    //top left
-    if (board?.[x - 1]?.[y - 1]) {
-        board[x - 1][y - 1].minesAround++
-    }
+    console.log(board)
+
+    // if (!board?.[x]?.[y - 1].opened) {
+    //     board[x][y - 1].opened = true
+    // }
+    // // topRight
+    // if (!board?.[x + 1]?.[y - 1].opened) {
+    //     board[x + 1][y - 1].opened = true
+    // }
+    // //right
+    // if (!board?.[x + 1]?.[y].opened) {
+    //     board[x + 1][y].opened = true
+    // }
+    // // bottom right
+    // if (!board?.[x + 1]?.[y + 1].opened) {
+    //     board[x + 1][y + 1].opened = true
+    // }
+    // // bottom
+    // if (!board?.[x]?.[y + 1].opened) {
+    //     board[x][y + 1].opened = true
+    // }
+    // //bottom left
+    // if (!board?.[x - 1]?.[y + 1].opened) {
+    //     board[x - 1][y + 1].opened = true
+    // }
+    // //left
+    // if (!board?.[x - 1]?.[y].opened) {
+    //     board[x - 1][y].opened = true
+    // }
+    // //top left
+    // if (!board?.[x - 1]?.[y - 1].opened) {
+    //     board[x - 1][y - 1].opened = true
+    // }
 }
 
 // const hasNeighbors = (board: board, x: number, y: number) => {}
@@ -129,7 +187,6 @@ export function Board() {
         setUserBoard((prevState) => {
             const mutateBoard = cloneDeep(prevState)
 
-            console.log(mutateBoard[excludeX][excludeY].minesAround)
             if (mutateBoard[excludeX][excludeY].minesAround > 0) {
                 setMines(excludeX, excludeY)
             }
@@ -138,10 +195,22 @@ export function Board() {
         })
     }
 
+    const openAllCells = (x: number, y: number) => {
+        setUserBoard((prevState) => {
+            const mutateBoard = cloneDeep(prevState)
+
+            firstOpening(mutateBoard, x, y)
+
+            return mutateBoard
+        })
+    }
+
     const leftHandle = (x: number, y: number) => {
         if (firstStep.current) {
             setMines(x, y)
+            openAllCells(x, y)
             firstStep.current = false
+            userBoard[x][y].opened = true
         }
 
         setUserBoard((prevState) => {
@@ -153,7 +222,6 @@ export function Board() {
             }
 
             if (mutateBoard[x][y].minesAround === 0 && !mutateBoard[x][y].flagged) {
-                console.log(mutateBoard[x][y].minesAround)
                 mutateBoard[x][y].opened = true
             }
 
