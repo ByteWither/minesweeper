@@ -61,18 +61,17 @@ const setMinesAroundCount = (board: board, x: number, y: number) => {
     // }
 }
 
-const firstOpening = (board: board, x: number, y: number) => {
+const openEmptyCell = (board: board, x: number, y: number) => {
     for (let i = -1; i <= 1; i++) {
         for (let j = -1; j <= 1; j++) {
-            if (board?.[x + j]?.[y + i] && !board?.[x + j]?.[y + i].opened) {
-                console.log(board[x + j][y + i].minesAround)
-                if (board[x + j][y + i].minesAround > 0) {
-                    let minesCount = board[x + j][y + i].minesAround
-                    board[x + j][y + i].opened = true
-                    board[x + j][y + i].minesAround = minesCount
-                } else {
-                    board[x + j][y + i].opened = true
-                }
+            if (
+                board?.[x + j]?.[y + i] &&
+                !board[x + j][y + i].opened &&
+                !board[x + j][y + i].isMine &&
+                board[x + j][y + i].minesAround === 0
+            ) {
+                board[x + j][y + i].opened = true
+                openEmptyCell(board, x + j, y + i)
             }
         }
     }
@@ -195,23 +194,20 @@ export function Board() {
         })
     }
 
-    const openAllCells = (x: number, y: number) => {
-        setUserBoard((prevState) => {
-            const mutateBoard = cloneDeep(prevState)
-
-            firstOpening(mutateBoard, x, y)
-
-            return mutateBoard
-        })
-    }
-
     const leftHandle = (x: number, y: number) => {
         if (firstStep.current) {
             setMines(x, y)
-            openAllCells(x, y)
             firstStep.current = false
             userBoard[x][y].opened = true
         }
+
+        setUserBoard((prevState) => {
+            const mutateBoard = cloneDeep(prevState)
+
+            openEmptyCell(mutateBoard, x, y)
+
+            return mutateBoard
+        })
 
         setUserBoard((prevState) => {
             const mutateBoard = cloneDeep(prevState)
