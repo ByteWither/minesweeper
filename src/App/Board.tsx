@@ -53,6 +53,8 @@ const setMinesAroundCount = (board: board, x: number, y: number) => {
     }
 }
 
+// const hasNeighbors = (board: board, x: number, y: number) => {}
+
 export function Board() {
     const firstStep = React.useRef<boolean>(true)
     const [userBoard, setUserBoard] = React.useState<board>([])
@@ -82,6 +84,8 @@ export function Board() {
         setUserBoard((prevState) => {
             prevState.map((item) => {
                 item.map((cell) => {
+                    cell.isMine = false
+                    cell.minesAround = 0
                     cell.flagged = false
                 })
             })
@@ -117,6 +121,17 @@ export function Board() {
 
             return mutateBoard
         })
+
+        setUserBoard((prevState) => {
+            const mutateBoard = cloneDeep(prevState)
+
+            console.log(mutateBoard[excludeX][excludeY].minesAround)
+            if (mutateBoard[excludeX][excludeY].minesAround > 0) {
+                setMines(excludeX, excludeY)
+            }
+
+            return mutateBoard
+        })
     }
 
     const leftHandle = (x: number, y: number) => {
@@ -124,13 +139,29 @@ export function Board() {
             setMines(x, y)
             firstStep.current = false
         }
+
+        setUserBoard((prevState) => {
+            const mutateBoard = cloneDeep(prevState)
+
+            if (mutateBoard[x][y].isMine) {
+                console.log("Game over")
+                return mutateBoard
+            }
+
+            if (mutateBoard[x][y].minesAround === 0 && !mutateBoard[x][y].flagged) {
+                console.log(mutateBoard[x][y].minesAround)
+                mutateBoard[x][y].opened = true
+            }
+
+            return mutateBoard
+        })
     }
 
     const rightHandle = (x: number, y: number) => {
         setUserBoard((prevState) => {
             const mutateBoard = cloneDeep(prevState)
 
-            if (!mutateBoard[x][y].opened) {
+            if (!mutateBoard[x][y].opened && mutateBoard[x][y].minesAround === 0) {
                 mutateBoard[x][y].flagged = !mutateBoard[x][y].flagged
             }
 
