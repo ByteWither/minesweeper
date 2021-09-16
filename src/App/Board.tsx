@@ -119,6 +119,10 @@ export function Board() {
                 setMinesAroundCount(mutateBoard, mineX, mineY)
             })
 
+            minesData.forEach(([mineX, mineY]) => {
+                mutateBoard[mineX][mineY].minesAround = 0
+            })
+
             return mutateBoard
         })
 
