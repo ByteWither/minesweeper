@@ -26,91 +26,45 @@ const setMinesAroundCount = (board: board, x: number, y: number) => {
             }
         }
     }
-
-    // //top
-    // if (board?.[x]?.[y - 1]) {
-    //     board[x][y - 1].minesAround++
-    // }
-    // // topRight
-    // if (board?.[x + 1]?.[y - 1]) {
-    //     board[x + 1][y - 1].minesAround++
-    // }
-    // //right
-    // if (board?.[x + 1]?.[y]) {
-    //     board[x + 1][y].minesAround++
-    // }
-    // // bottom right
-    // if (board?.[x + 1]?.[y + 1]) {
-    //     board[x + 1][y + 1].minesAround++
-    // }
-    // // bottom
-    // if (board?.[x]?.[y + 1]) {
-    //     board[x][y + 1].minesAround++
-    // }
-    // //bottom left
-    // if (board?.[x - 1]?.[y + 1]) {
-    //     board[x - 1][y + 1].minesAround++
-    // }
-    // //left
-    // if (board?.[x - 1]?.[y]) {
-    //     board[x - 1][y].minesAround++
-    // }
-    // //top left
-    // if (board?.[x - 1]?.[y - 1]) {
-    //     board[x - 1][y - 1].minesAround++
-    // }
 }
 
 const openEmptyCell = (board: board, x: number, y: number) => {
+    const steps = [
+        [0, -1],
+        [0, +1],
+        [-1, 0],
+        [+1, 0],
+    ]
     for (let i = -1; i <= 1; i++) {
         for (let j = -1; j <= 1; j++) {
-            if (
-                board?.[x + j]?.[y + i] &&
-                !board[x + j][y + i].opened &&
-                !board[x + j][y + i].isMine &&
-                board[x + j][y + i].minesAround === 0
-            ) {
-                board[x + j][y + i].opened = true
-                openEmptyCell(board, x + j, y + i)
-            }
+            steps.forEach(([stepX, stepY]) => {
+                const stepCoords = stepX + stepY
+                const coords = j + i
+
+                if (
+                    stepCoords === coords &&
+                    board?.[x + j]?.[y + i] &&
+                    !board[x + j][y + i].opened &&
+                    !board[x + j][y + i].isMine &&
+                    board[x + j][y + i].minesAround === 0
+                ) {
+                    board[x + j][y + i].opened = true
+                    openEmptyCell(board, x + j, y + i)
+                }
+            })
         }
     }
-    console.log(board)
-
-    // if (!board?.[x]?.[y - 1].opened) {
-    //     board[x][y - 1].opened = true
-    // }
-    // // topRight
-    // if (!board?.[x + 1]?.[y - 1].opened) {
-    //     board[x + 1][y - 1].opened = true
-    // }
-    // //right
-    // if (!board?.[x + 1]?.[y].opened) {
-    //     board[x + 1][y].opened = true
-    // }
-    // // bottom right
-    // if (!board?.[x + 1]?.[y + 1].opened) {
-    //     board[x + 1][y + 1].opened = true
-    // }
-    // // bottom
-    // if (!board?.[x]?.[y + 1].opened) {
-    //     board[x][y + 1].opened = true
-    // }
-    // //bottom left
-    // if (!board?.[x - 1]?.[y + 1].opened) {
-    //     board[x - 1][y + 1].opened = true
-    // }
-    // //left
-    // if (!board?.[x - 1]?.[y].opened) {
-    //     board[x - 1][y].opened = true
-    // }
-    // //top left
-    // if (!board?.[x - 1]?.[y - 1].opened) {
-    //     board[x - 1][y - 1].opened = true
-    // }
 }
 
-// const hasNeighbors = (board: board, x: number, y: number) => {}
+const getPointsAround = (x: number, y: number) => {
+    const result: Array<[number, number]> = []
+    for (let i = -1; i <= 1; i++) {
+        for (let j = -1; j <= 1; j++) {
+            result.push([x + i, y + j])
+        }
+    }
+    return result
+}
 
 export function Board() {
     const firstStep = React.useRef<boolean>(true)
@@ -154,13 +108,15 @@ export function Board() {
         clearBoard()
         let minesCount = 10
         const minesData: Array<[number, number]> = []
+        const around = getPointsAround(excludeX, excludeY)
 
         while (minesCount > 0) {
             const mine = generateMine(CELLS, ROWS)
 
             if (
-                mine[0] !== excludeX &&
-                mine[1] !== excludeY &&
+                !around.some(
+                    (aroundMine) => aroundMine[0] === mine[0] && aroundMine[1] === mine[1],
+                ) &&
                 !minesData.some((existMine) => existMine[0] === mine[0] && existMine[1] === mine[1])
             ) {
                 minesData.push(mine)
@@ -179,16 +135,6 @@ export function Board() {
             minesData.forEach(([mineX, mineY]) => {
                 mutateBoard[mineX][mineY].minesAround = 0
             })
-
-            return mutateBoard
-        })
-
-        setUserBoard((prevState) => {
-            const mutateBoard = cloneDeep(prevState)
-
-            if (mutateBoard[excludeX][excludeY].minesAround > 0) {
-                setMines(excludeX, excludeY)
-            }
 
             return mutateBoard
         })
