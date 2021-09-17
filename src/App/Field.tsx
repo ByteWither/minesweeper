@@ -12,8 +12,8 @@ type FieldProps = {
 
 export function Field({ x, y, state, leftClick, rightClick }: FieldProps) {
     const getState = () => {
-        if (typeof state === "number") {
-            return "" + state
+        if (state === "opened" && typeof state === "number") {
+            return state
         }
 
         switch (state) {
@@ -24,7 +24,7 @@ export function Field({ x, y, state, leftClick, rightClick }: FieldProps) {
                 return "🚩"
 
             case "bomb":
-                return "💣"
+                return null
 
             default:
                 return null
@@ -43,8 +43,6 @@ export function Field({ x, y, state, leftClick, rightClick }: FieldProps) {
     return (
         <button className="field" onClick={leftClickHandle} onContextMenu={rightClickHandle}>
             {getState()}
-            {/* {x}
-            {y} */}
         </button>
     )
 }
