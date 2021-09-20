@@ -44,12 +44,23 @@ const openEmptyCell = (board: board, x: number, y: number) => {
                 if (
                     stepCoords === coords &&
                     board?.[x + j]?.[y + i] &&
-                    !board[x + j][y + i].opened &&
                     !board[x + j][y + i].isMine &&
-                    board[x + j][y + i].minesAround === 0
+                    !board[x + j][y + i].opened &&
+                    board[x][y].minesAround === 0
                 ) {
-                    board[x + j][y + i].opened = true
+                    if (board[x + j][y + i].minesAround === 0) {
+                        board[x + j][y + i].opened = true
+                    }
                     openEmptyCell(board, x + j, y + i)
+                } else if (
+                    board?.[x + j]?.[y + i] &&
+                    !board[x + j][y + i].isMine &&
+                    !board[x + j][y + i].opened &&
+                    board[x][y].minesAround === 0
+                ) {
+                    if (board[x + j][y + i].minesAround > 0 && board[x][y].opened) {
+                        board[x + j][y + i].opened = true
+                    }
                 }
             })
         }
@@ -163,7 +174,7 @@ export function Board() {
                 return mutateBoard
             }
 
-            if (mutateBoard[x][y].minesAround === 0 && !mutateBoard[x][y].flagged) {
+            if (!mutateBoard[x][y].flagged) {
                 mutateBoard[x][y].opened = true
             }
 
@@ -175,7 +186,7 @@ export function Board() {
         setUserBoard((prevState) => {
             const mutateBoard = cloneDeep(prevState)
 
-            if (!mutateBoard[x][y].opened && mutateBoard[x][y].minesAround === 0) {
+            if (!mutateBoard[x][y].opened) {
                 mutateBoard[x][y].flagged = !mutateBoard[x][y].flagged
             }
 
@@ -191,10 +202,27 @@ export function Board() {
             return "opened"
         } else if (field.isMine) {
             return "bomb"
-        } else if (field.minesAround) {
+        }
+        return null
+    }
+
+    const getActualNumber = (x: number, y: number) => {
+        const field = userBoard[x][y]
+
+        if (field.minesAround > 0) {
             return field.minesAround
         }
         return null
+    }
+
+    const getClass = (x: number, y: number) => {
+        const field = userBoard[x][y]
+
+        if (field.opened) {
+            return "field field-opened"
+        }
+
+        return "field"
     }
 
     return (
@@ -206,9 +234,11 @@ export function Board() {
                             key={"" + rowIndex + cellIndex}
                             x={rowIndex}
                             y={cellIndex}
+                            minesAround={getActualNumber(rowIndex, cellIndex)}
                             state={getActualState(rowIndex, cellIndex)}
                             leftClick={leftHandle}
                             rightClick={rightHandle}
+                            className={getClass(rowIndex, cellIndex)}
                         />
                     ))}
                 </div>
