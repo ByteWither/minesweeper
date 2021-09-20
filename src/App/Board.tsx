@@ -169,7 +169,7 @@ export function Board() {
         setUserBoard((prevState) => {
             const mutateBoard = cloneDeep(prevState)
 
-            if (mutateBoard[x][y].isMine) {
+            if (mutateBoard[x][y].isMine && !mutateBoard[x][y].flagged) {
                 console.log("Game over")
                 return mutateBoard
             }
