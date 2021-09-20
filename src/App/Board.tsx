@@ -46,6 +46,7 @@ const openEmptyCell = (board: board, x: number, y: number) => {
                     board?.[x + j]?.[y + i] &&
                     !board[x + j][y + i].isMine &&
                     !board[x + j][y + i].opened &&
+                    !board[x + j][y + i].flagged &&
                     board[x][y].minesAround === 0
                 ) {
                     if (board[x + j][y + i].minesAround === 0) {
@@ -56,6 +57,7 @@ const openEmptyCell = (board: board, x: number, y: number) => {
                     board?.[x + j]?.[y + i] &&
                     !board[x + j][y + i].isMine &&
                     !board[x + j][y + i].opened &&
+                    !board[x + j][y + i].flagged &&
                     board[x][y].minesAround === 0
                 ) {
                     if (board[x + j][y + i].minesAround > 0 && board[x][y].opened) {
