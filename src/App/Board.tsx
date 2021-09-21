@@ -3,9 +3,6 @@ import { Field, States } from "./Field"
 import { cloneDeep } from "lodash"
 import "../Sass/blocks/board.sass"
 
-const ROWS = 10
-const CELLS = 10
-
 type boardItem = {
     isMine: boolean
     minesAround: number
@@ -79,9 +76,35 @@ const getPointsAround = (x: number, y: number) => {
     return result
 }
 
-export function Board() {
+type boardProps = {
+    difficulty: string
+}
+
+export function Board({ difficulty }: boardProps) {
     const firstStep = React.useRef<boolean>(true)
     const [userBoard, setUserBoard] = React.useState<board>([])
+
+    let ROWS: number
+    let CELLS: number
+    let MINESCOUNT: number
+
+    switch (difficulty) {
+        case "Easy":
+            ROWS = 9
+            CELLS = 9
+            MINESCOUNT = 10
+            break
+        case "Normal":
+            ROWS = 16
+            CELLS = 16
+            MINESCOUNT = 40
+            break
+        case "Hard":
+            ROWS = 30
+            CELLS = 16
+            MINESCOUNT = 99
+            break
+    }
 
     const boardFill = () => {
         const board: board = []
@@ -119,11 +142,10 @@ export function Board() {
 
     const setMines = (excludeX: number, excludeY: number) => {
         clearBoard()
-        let minesCount = 10
         const minesData: Array<[number, number]> = []
         const around = getPointsAround(excludeX, excludeY)
 
-        while (minesCount > 0) {
+        while (MINESCOUNT > 0) {
             const mine = generateMine(CELLS, ROWS)
 
             if (
@@ -133,7 +155,7 @@ export function Board() {
                 !minesData.some((existMine) => existMine[0] === mine[0] && existMine[1] === mine[1])
             ) {
                 minesData.push(mine)
-                minesCount--
+                MINESCOUNT--
             }
         }
 
