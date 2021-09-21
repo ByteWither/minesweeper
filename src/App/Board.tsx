@@ -76,17 +76,6 @@ const getPointsAround = (x: number, y: number) => {
     return result
 }
 
-const getOpenedCells = (board: board, countOpenCells: number) => {
-    board.forEach((row) => {
-        row.map((cell) => {
-            if (cell.opened) {
-                countOpenCells--
-            }
-        })
-    })
-    return countOpenCells
-}
-
 const getMinesCells = (board: board) => {
     board.forEach((row) => {
         row.map((cell) => {
@@ -100,11 +89,14 @@ const getMinesCells = (board: board) => {
     })
 }
 
+type gameStateTypes = "lose" | "win"
+
 type boardProps = {
     difficulty: string
+    onGameState: (state: gameStateTypes) => void
 }
 
-export function Board({ difficulty }: boardProps) {
+function BoardComponent({ difficulty, onGameState }: boardProps) {
     const firstStep = React.useRef<boolean>(true)
     const [userBoard, setUserBoard] = React.useState<board>([])
 
@@ -131,7 +123,6 @@ export function Board({ difficulty }: boardProps) {
 
             board.push(rowsData)
         }
-        console.log(board)
         setUserBoard(board)
     }
 
@@ -156,6 +147,22 @@ export function Board({ difficulty }: boardProps) {
         countOpenCells.current = rows.current * cells.current - minesCount.current
         boardFill()
     }, [difficulty])
+
+    React.useEffect(() => {
+        if (userBoard.length) {
+            if (userBoard.some((row) => row.some((cell) => cell.isMine && cell.opened))) {
+                console.log("Game over")
+                onGameState("lose")
+            } else if (
+                userBoard.every((row) =>
+                    row.every((cell) => (!cell.isMine && cell.opened) || cell.isMine),
+                )
+            ) {
+                console.log(userBoard, "Win!")
+                onGameState("win")
+            }
+        }
+    }, [userBoard])
 
     const clearBoard = () => {
         setUserBoard((prevState) => {
@@ -210,42 +217,23 @@ export function Board({ difficulty }: boardProps) {
         if (firstStep.current) {
             setMines(x, y)
             firstStep.current = false
-            userBoard[x][y].opened = true
         }
 
         setUserBoard((prevState) => {
-            const mutateBoard = cloneDeep(prevState)
+            if (!prevState[x][y].opened && !prevState[x][y].flagged) {
+                const mutateBoard = cloneDeep(prevState)
+                mutateBoard[x][y].opened = true
 
-            openEmptyCell(mutateBoard, x, y)
+                if (mutateBoard[x][y].isMine) {
+                    getMinesCells(mutateBoard)
+                } else {
+                    openEmptyCell(mutateBoard, x, y)
+                }
 
-            return mutateBoard
-        })
-
-        setUserBoard((prevState) => {
-            const mutateBoard = cloneDeep(prevState)
-
-            if (mutateBoard[x][y].isMine && !mutateBoard[x][y].flagged) {
-                console.log("Game over")
-                getMinesCells(mutateBoard)
                 return mutateBoard
             }
 
-            if (!mutateBoard[x][y].flagged) {
-                mutateBoard[x][y].opened = true
-            }
-
-            return mutateBoard
-        })
-
-        setUserBoard((prevState) => {
-            const mutateBoard = cloneDeep(prevState)
-            let count = getOpenedCells(mutateBoard, countOpenCells.current)
-
-            if (count === 0) {
-                console.log("Win!")
-            }
-
-            return mutateBoard
+            return prevState
         })
     }
 
@@ -318,6 +306,9 @@ export function Board({ difficulty }: boardProps) {
                     ))}
                 </div>
             ))}
+            <h1>{}</h1>
         </div>
     )
 }
+
+export const Board = React.memo(BoardComponent)
