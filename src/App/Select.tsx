@@ -13,12 +13,10 @@ type selectProps = {
     onChange?: (value: value) => void
 }
 
-export function Select({ value = null, options = [], onChange = null }: selectProps) {
+function SelectComponent({ value = null, options = [], onChange = null }: selectProps) {
     const changeHandler = (e: React.ChangeEvent<HTMLSelectElement>) => {
         if (onChange) onChange(e.target.value)
     }
-
-    // const options: Array<string> = ["Easy", "Normal", "Hard"]
 
     return (
         <div className="select">
@@ -34,3 +32,5 @@ export function Select({ value = null, options = [], onChange = null }: selectPr
         </div>
     )
 }
+
+export const Select = React.memo(SelectComponent)
