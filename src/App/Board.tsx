@@ -103,54 +103,56 @@ type boardProps = {
 
 export function Board({ difficulty }: boardProps) {
     const firstStep = React.useRef<boolean>(true)
-    // const [difficultyLevel, setDifficultyLevel] = React.useState(difficulty)
     const [userBoard, setUserBoard] = React.useState<board>([])
 
-    let ROWS: number
-    let CELLS: number
-    let MINESCOUNT: number
+    const rows = React.useRef<number>(9)
+    const cells = React.useRef<number>(9)
+    const minesCount = React.useRef<number>(10)
 
-    console.log(difficulty)
-
-    switch (difficulty) {
-        case "Easy":
-            ROWS = 9
-            CELLS = 9
-            MINESCOUNT = 10
-            break
-        case "Normal":
-            ROWS = 16
-            CELLS = 16
-            MINESCOUNT = 40
-            break
-        case "Hard":
-            ROWS = 30
-            CELLS = 16
-            MINESCOUNT = 99
-            break
-    }
-    const countOpenCells = React.useRef(ROWS * CELLS - MINESCOUNT)
+    const countOpenCells = React.useRef(rows.current * cells.current - minesCount.current)
 
     const boardFill = () => {
+        clearBoard()
+        firstStep.current = true
         const board: board = []
-        for (let r = 0; r < ROWS; r++) {
-            const rows: Array<boardItem> = []
-            for (let c = 0; c < CELLS; c++) {
-                rows.push({
+        for (let r = 0; r < rows.current; r++) {
+            const rowsData: Array<boardItem> = []
+            for (let c = 0; c < cells.current; c++) {
+                rowsData.push({
                     isMine: false,
                     minesAround: 0,
                     flagged: false,
                     opened: false,
                 })
             }
-            board.push(rows)
+
+            board.push(rowsData)
         }
+        console.log(board)
         setUserBoard(board)
     }
 
     React.useEffect(() => {
+        switch (difficulty) {
+            case "easy":
+                rows.current = 9
+                cells.current = 9
+                minesCount.current = 10
+                break
+            case "normal":
+                rows.current = 16
+                cells.current = 16
+                minesCount.current = 40
+                break
+            case "hard":
+                rows.current = 20
+                cells.current = 20
+                minesCount.current = 99
+                break
+        }
+        countOpenCells.current = rows.current * cells.current - minesCount.current
         boardFill()
-    }, [])
+    }, [difficulty])
 
     const clearBoard = () => {
         setUserBoard((prevState) => {
@@ -159,6 +161,7 @@ export function Board({ difficulty }: boardProps) {
                     cell.isMine = false
                     cell.minesAround = 0
                     cell.flagged = false
+                    cell.opened = false
                 })
             })
             return prevState
@@ -170,8 +173,8 @@ export function Board({ difficulty }: boardProps) {
         const minesData: Array<[number, number]> = []
         const around = getPointsAround(excludeX, excludeY)
 
-        while (MINESCOUNT > 0) {
-            const mine = generateMine(CELLS, ROWS)
+        while (minesCount.current > 0) {
+            const mine = generateMine(cells.current, rows.current)
 
             if (
                 !around.some(
@@ -180,7 +183,7 @@ export function Board({ difficulty }: boardProps) {
                 !minesData.some((existMine) => existMine[0] === mine[0] && existMine[1] === mine[1])
             ) {
                 minesData.push(mine)
-                MINESCOUNT--
+                minesCount.current--
             }
         }
 
