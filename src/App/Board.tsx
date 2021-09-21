@@ -91,6 +91,9 @@ const getMinesCells = (board: board) => {
     board.forEach((row) => {
         row.map((cell) => {
             if (cell.isMine) {
+                if (cell.flagged) {
+                    cell.flagged = false
+                }
                 cell.opened = true
             }
         })
