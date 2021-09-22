@@ -11,6 +11,11 @@
         "baseUrl": "./",
         "module": "CommonJS",
         "moduleResolution": "node",
+        "paths": {
+            "App": ["src/App"],
+            "Components/*": ["src/Components/*"],
+            "Shared/*": ["src/Shared/*"]
+        },
         "resolveJsonModule": true,
         "noEmitOnError": true,
         "removeComments": true,
