@@ -17,6 +17,8 @@ type faceProps = {
 }
 
 export function Face({ state }: faceProps) {
+    require("./index.sass")
+
     return (
         <div>
             <button>{STATE_LIST[state]}</button>

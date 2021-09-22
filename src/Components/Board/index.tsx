@@ -1,7 +1,6 @@
 import React from "react"
-import { Field, States } from "./Field"
+import { Field, States } from "Components/Field"
 import { cloneDeep } from "lodash"
-import "../Sass/blocks/board.sass"
 
 type boardItem = {
     isMine: boolean
@@ -272,6 +271,8 @@ function BoardComponent({ difficulty, onGameState }: boardProps) {
         }
         return null
     }
+
+    require("./index.sass")
 
     return (
         <div className="board">

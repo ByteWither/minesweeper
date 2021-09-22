@@ -18,6 +18,8 @@ function SelectComponent({ value = null, options = [], onChange = null }: select
         if (onChange) onChange(e.target.value)
     }
 
+    require("./index.sass")
+
     return (
         <div className="select">
             <select value={value} onChange={changeHandler}>

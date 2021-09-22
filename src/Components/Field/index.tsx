@@ -1,5 +1,4 @@
 import React from "react"
-import "../Sass/components/field.sass"
 
 export type States = "flag" | "opened" | "bomb"
 type FieldProps = {
@@ -19,7 +18,6 @@ function FieldComponent({
     rightClick = null,
     minesAround = 0,
 }: FieldProps) {
-    console.log("rerender")
     const getState = () => {
         switch (state) {
             case "flag":
@@ -46,6 +44,8 @@ function FieldComponent({
 
     if (state === "bomb") className += " field--bomb"
     if (state === "opened") className += " field--opened"
+
+    require("./index.sass")
 
     return (
         <button className={className} onClick={leftClickHandle} onContextMenu={rightClickHandle}>
