@@ -213,7 +213,7 @@ function BoardComponent({ difficulty, onGameState }: boardProps) {
         })
     }
 
-    const leftHandle = (x: number, y: number) => {
+    const leftHandle = React.useCallback((x: number, y: number) => {
         if (firstStep.current) {
             setMines(x, y)
             firstStep.current = false
@@ -235,56 +235,42 @@ function BoardComponent({ difficulty, onGameState }: boardProps) {
 
             return prevState
         })
-    }
+    }, [])
 
-    const rightHandle = (x: number, y: number) => {
+    const rightHandle = React.useCallback((x: number, y: number) => {
         setUserBoard((prevState) => {
-            const mutateBoard = cloneDeep(prevState)
+            if (!prevState[x][y].opened) {
+                const mutateBoard = cloneDeep(prevState)
 
-            if (!mutateBoard[x][y].opened) {
                 mutateBoard[x][y].flagged = !mutateBoard[x][y].flagged
-            }
 
-            return mutateBoard
+                return mutateBoard
+            }
+            return prevState
         })
-    }
+    }, [])
 
     const getActualState = (x: number, y: number): States => {
         const field = userBoard[x][y]
-        if (field.flagged) {
-            return "flag"
+
+        if (field.isMine && field.opened) {
+            return "bomb"
         } else if (field.opened) {
             return "opened"
+        } else if (field.flagged) {
+            return "flag"
+        } else {
+            return null
         }
-        return null
     }
 
-    const getActualNumber = (x: number, y: number) => {
-        const field = userBoard[x][y]
-
-        if (field.minesAround > 0) {
-            return field.minesAround
-        }
-        return null
-    }
-
-    const openBombs = (x: number, y: number) => {
-        const field = userBoard[x][y]
-
-        if (field.opened && field.isMine) {
-            return true
-        }
-        return false
-    }
-
-    const getClass = (x: number, y: number) => {
+    const getMinesAround = (x: number, y: number) => {
         const field = userBoard[x][y]
 
         if (field.opened) {
-            return "field field-opened"
+            return field.minesAround
         }
-
-        return "field"
+        return null
     }
 
     return (
@@ -299,9 +285,7 @@ function BoardComponent({ difficulty, onGameState }: boardProps) {
                             state={getActualState(rowIndex, cellIndex)}
                             leftClick={leftHandle}
                             rightClick={rightHandle}
-                            minesAround={getActualNumber(rowIndex, cellIndex)}
-                            openBombs={openBombs(rowIndex, cellIndex)}
-                            className={getClass(rowIndex, cellIndex)}
+                            minesAround={getMinesAround(rowIndex, cellIndex)}
                         />
                     ))}
                 </div>
