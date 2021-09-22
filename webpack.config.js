@@ -1,5 +1,6 @@
 const path = require("path")
 const HtmlWebpackPlugin = require("html-webpack-plugin")
+const TsconfigPathsPlugin = require("tsconfig-paths-webpack-plugin")
 
 module.exports = () => {
     return {
@@ -40,6 +41,7 @@ module.exports = () => {
         ],
         resolve: {
             extensions: [".tsx", ".ts", ".jsx", ".js"],
+            plugins: [new TsconfigPathsPlugin()],
         },
         output: {
             path: path.resolve(__dirname, "./dist"),
