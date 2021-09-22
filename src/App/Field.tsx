@@ -1,7 +1,7 @@
 import React from "react"
 import "../Sass/components/field.sass"
 
-export type States = "flag" | "opened"
+export type States = "flag" | "opened" | "bomb"
 type FieldProps = {
     x: number
     y: number
@@ -9,34 +9,25 @@ type FieldProps = {
     leftClick: (x: number, y: number) => void
     rightClick: (x: number, y: number) => void
     minesAround: number
-    openBombs: boolean
-    className: string
 }
 
-export function Field({
-    x,
-    y,
-    state,
-    leftClick,
-    rightClick,
-    minesAround,
-    openBombs,
-    className,
+function FieldComponent({
+    x = 0,
+    y = 0,
+    state = null,
+    leftClick = null,
+    rightClick = null,
+    minesAround = 0,
 }: FieldProps) {
+    console.log("rerender")
     const getState = () => {
-        if (state === "opened") {
-            if (minesAround) {
-                return minesAround
-            }
-            if (openBombs) {
-                return "💣"
-            }
-            return null
-        }
-
         switch (state) {
             case "flag":
                 return "🚩"
+            case "bomb":
+                return "💣"
+            case "opened":
+                return minesAround || null
             default:
                 return null
         }
@@ -51,9 +42,16 @@ export function Field({
         rightClick(x, y)
     }
 
+    let className = "field"
+
+    if (state === "bomb") className += " field--bomb"
+    if (state === "opened") className += " field--opened"
+
     return (
         <button className={className} onClick={leftClickHandle} onContextMenu={rightClickHandle}>
             {getState()}
         </button>
     )
 }
+
+export const Field = React.memo(FieldComponent)
