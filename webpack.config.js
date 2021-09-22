@@ -22,7 +22,14 @@ module.exports = () => {
                         // Translates CSS into CommonJS
                         "css-loader",
                         // Compiles Sass to CSS
-                        "sass-loader",
+                        {
+                            loader: "sass-loader",
+                            options: {
+                                sourceMap: true,
+                                data: '@import "_vars";',
+                                includePaths: [path.join(__dirname, "./src/Shared/Styles")],
+                            },
+                        },
                     ],
                 },
             ],
