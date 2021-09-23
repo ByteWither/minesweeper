@@ -12,7 +12,8 @@ const DIFFICULTIES: Select = [
 
 function App() {
     const [diff, setDiff] = React.useState<string>("easy")
-    const [gameState, setGameState] = React.useState<FaceTypes>(null)
+    const [gameState, setGameState] = React.useState<FaceTypes>("game")
+    const gameResetFn = React.useRef<() => void>()
 
     const changeDifficulty = React.useCallback((value: string) => {
         setDiff(value)
@@ -22,15 +23,23 @@ function App() {
         setGameState(value)
     }, [])
 
+    const gameResetter = React.useCallback((resetter) => {
+        gameResetFn.current = resetter
+    }, [])
+
+    const resetHandler = () => {
+        gameResetFn.current()
+    }
+
     require("./index.sass")
 
     return (
         <>
             <div className="menu">
                 <Select options={DIFFICULTIES} value={diff} onChange={changeDifficulty} />
-                <Face state={gameState} />
+                <Face state={gameState} onResetGame={resetHandler} />
             </div>
-            <Board difficulty={diff} onGameState={changeEmoji} />
+            <Board difficulty={diff} onGameState={changeEmoji} getReset={gameResetter} />
         </>
     )
 }
