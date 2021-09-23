@@ -88,14 +88,15 @@ const getMinesCells = (board: board) => {
     })
 }
 
-type gameStateTypes = "lose" | "win"
+type gameStateTypes = "lose" | "win" | "game"
 
 type boardProps = {
     difficulty: string
     onGameState: (state: gameStateTypes) => void
+    getReset?: (resetter: () => void) => void
 }
 
-function BoardComponent({ difficulty, onGameState }: boardProps) {
+function BoardComponent({ difficulty, onGameState, getReset = null }: boardProps) {
     const firstStep = React.useRef<boolean>(true)
     const [userBoard, setUserBoard] = React.useState<board>([])
 
@@ -107,7 +108,6 @@ function BoardComponent({ difficulty, onGameState }: boardProps) {
 
     const boardFill = () => {
         clearBoard()
-        firstStep.current = true
         const board: board = []
         for (let r = 0; r < rows.current; r++) {
             const rowsData: Array<boardItem> = []
@@ -150,22 +150,25 @@ function BoardComponent({ difficulty, onGameState }: boardProps) {
     React.useEffect(() => {
         if (userBoard.length) {
             if (userBoard.some((row) => row.some((cell) => cell.isMine && cell.opened))) {
-                console.log("Game over")
                 onGameState("lose")
             } else if (
                 userBoard.every((row) =>
                     row.every((cell) => (!cell.isMine && cell.opened) || cell.isMine),
                 )
             ) {
-                console.log(userBoard, "Win!")
                 onGameState("win")
             }
         }
     }, [userBoard])
 
     const clearBoard = () => {
+        firstStep.current = true
+        onGameState("game")
+
         setUserBoard((prevState) => {
-            prevState.map((item) => {
+            const mutateBoard = cloneDeep(prevState)
+
+            mutateBoard.map((item) => {
                 item.map((cell) => {
                     cell.isMine = false
                     cell.minesAround = 0
@@ -173,14 +176,20 @@ function BoardComponent({ difficulty, onGameState }: boardProps) {
                     cell.opened = false
                 })
             })
-            return prevState
+
+            return mutateBoard
         })
     }
+
+    React.useEffect(() => {
+        if (getReset) getReset(clearBoard)
+    }, [getReset])
 
     const setMines = (excludeX: number, excludeY: number) => {
         clearBoard()
         const minesData: Array<[number, number]> = []
         const around = getPointsAround(excludeX, excludeY)
+        const countMines = minesCount.current
 
         while (minesCount.current > 0) {
             const mine = generateMine(cells.current, rows.current)
@@ -195,6 +204,8 @@ function BoardComponent({ difficulty, onGameState }: boardProps) {
                 minesCount.current--
             }
         }
+
+        minesCount.current = countMines
 
         setUserBoard((prevState) => {
             const mutateBoard = cloneDeep(prevState)
