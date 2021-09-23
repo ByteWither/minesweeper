@@ -3,6 +3,7 @@ import ReactDOM from "react-dom"
 import { Board } from "Components/Board"
 import { Face, FaceTypes } from "Components/Face"
 import { Select } from "Components/Select"
+import { Timer } from "Components/Timer"
 
 const DIFFICULTIES: Select = [
     { value: "easy", title: "Easy" },
@@ -13,6 +14,8 @@ const DIFFICULTIES: Select = [
 function App() {
     const [diff, setDiff] = React.useState<string>("easy")
     const [gameState, setGameState] = React.useState<FaceTypes>("game")
+    const [second, setSecond] = React.useState(0)
+    const [minute, setMinute] = React.useState(0)
     const gameResetFn = React.useRef<() => void>()
 
     const changeDifficulty = React.useCallback((value: string) => {
@@ -31,6 +34,11 @@ function App() {
         gameResetFn.current()
     }
 
+    const getSeconds = (seconds: number, minute: number) => {
+        setSecond(seconds)
+        setMinute(minute)
+    }
+
     require("./index.sass")
 
     return (
@@ -38,8 +46,14 @@ function App() {
             <div className="menu">
                 <Select options={DIFFICULTIES} value={diff} onChange={changeDifficulty} />
                 <Face state={gameState} onResetGame={resetHandler} />
+                <Timer seconds={second} minute={minute} />
             </div>
-            <Board difficulty={diff} onGameState={changeEmoji} getReset={gameResetter} />
+            <Board
+                difficulty={diff}
+                timerSecond={getSeconds}
+                onGameState={changeEmoji}
+                getReset={gameResetter}
+            />
         </>
     )
 }
