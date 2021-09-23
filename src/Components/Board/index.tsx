@@ -93,12 +93,17 @@ type gameStateTypes = "lose" | "win" | "game"
 type boardProps = {
     difficulty: string
     onGameState: (state: gameStateTypes) => void
-    getReset?: (resetter: () => void) => void
+    getReset: (resetter: () => void) => void
+    timerSecond: (second: number, minute: number) => void
 }
 
-function BoardComponent({ difficulty, onGameState, getReset = null }: boardProps) {
+function BoardComponent({ difficulty, timerSecond, onGameState, getReset = null }: boardProps) {
     const firstStep = React.useRef<boolean>(true)
     const [userBoard, setUserBoard] = React.useState<board>([])
+
+    const seconds = React.useRef(0)
+    const minute = React.useRef(0)
+    let interval: NodeJS.Timer = null
 
     const rows = React.useRef<number>(9)
     const cells = React.useRef<number>(9)
@@ -151,12 +156,14 @@ function BoardComponent({ difficulty, onGameState, getReset = null }: boardProps
         if (userBoard.length) {
             if (userBoard.some((row) => row.some((cell) => cell.isMine && cell.opened))) {
                 onGameState("lose")
+                stopTime()
             } else if (
                 userBoard.every((row) =>
                     row.every((cell) => (!cell.isMine && cell.opened) || cell.isMine),
                 )
             ) {
                 onGameState("win")
+                stopTime()
             }
         }
     }, [userBoard])
@@ -164,6 +171,11 @@ function BoardComponent({ difficulty, onGameState, getReset = null }: boardProps
     const clearBoard = () => {
         firstStep.current = true
         onGameState("game")
+
+        stopTime()
+        seconds.current = 0
+        minute.current = 0
+        timerSecond(seconds.current, minute.current)
 
         setUserBoard((prevState) => {
             const mutateBoard = cloneDeep(prevState)
@@ -223,9 +235,24 @@ function BoardComponent({ difficulty, onGameState, getReset = null }: boardProps
         })
     }
 
+    const getTime = () => {
+        interval = setInterval(() => {
+            seconds.current++
+            if (seconds.current % 60 === 0) {
+                minute.current++
+            }
+            timerSecond(seconds.current, minute.current)
+        }, 1000)
+    }
+
+    const stopTime = () => {
+        clearInterval(interval)
+    }
+
     const leftHandle = React.useCallback((x: number, y: number) => {
         if (firstStep.current) {
             setMines(x, y)
+            getTime()
             firstStep.current = false
         }
 
