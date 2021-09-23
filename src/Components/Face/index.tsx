@@ -1,6 +1,6 @@
 import React from "react"
 
-export type FaceTypes = "lose" | "win"
+export type FaceTypes = "lose" | "win" | "game"
 
 type stateList = {
     [key in FaceTypes]: string
@@ -9,19 +9,24 @@ type stateList = {
 const STATE_LIST: stateList = {
     lose: "💀",
     win: "😎",
-    // game: "🙂",
+    game: "🙂",
 }
 
 type faceProps = {
     state: FaceTypes
+    onResetGame: () => void
 }
 
-export function Face({ state }: faceProps) {
+export function Face({ state, onResetGame }: faceProps) {
     require("./index.sass")
 
+    const onClick = () => {
+        onResetGame()
+    }
+
     return (
-        <div>
-            <button>{STATE_LIST[state]}</button>
+        <div className="face">
+            <button onClick={onClick}>{STATE_LIST[state]}</button>
         </div>
     )
 }
