@@ -16,7 +16,7 @@ function TimerComponent({ state }: timerProp) {
         timer = setInterval(() => {
             setSecondValue((prevState) => {
                 prevState++
-                if (prevState !== 0 && prevState % 10 === 0) {
+                if (prevState !== 0 && prevState % 60 === 0) {
                     setMinuteValue(minute.current++)
                     prevState = 0
                 }
