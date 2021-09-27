@@ -1,6 +1,6 @@
 import React from "react"
 
-export type FaceTypes = "lose" | "win" | "game"
+export type FaceTypes = "lose" | "win" | "game" | "start"
 
 type stateList = {
     [key in FaceTypes]: string
@@ -10,6 +10,7 @@ const STATE_LIST: stateList = {
     lose: "💀",
     win: "😎",
     game: "🙂",
+    start: "🙂",
 }
 
 type faceProps = {
