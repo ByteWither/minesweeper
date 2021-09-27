@@ -6,27 +6,27 @@ type timerProp = {
 }
 
 function TimerComponent({ state }: timerProp) {
-    const seconds = React.useRef(0)
-    const minute = React.useRef(0)
-    const [secondValue, setSecondValue] = React.useState(seconds.current)
-    const [minuteValue, setMinuteValue] = React.useState(minute.current)
-    let timer: NodeJS.Timer
+    const timerBlock = React.useRef<HTMLSpanElement>()
+
+    const timer = React.useRef<number>(0)
+    const timerValue = React.useRef<number>(0)
 
     const startGame = React.useCallback(() => {
-        timer = setInterval(() => {
-            setSecondValue((prevState) => {
-                prevState++
-                if (prevState !== 0 && prevState % 60 === 0) {
-                    setMinuteValue(minute.current++)
-                    prevState = 0
-                }
-                return prevState
-            })
+        timer.current = window.setInterval(() => {
+            timerValue.current += 1000
+
+            const minutes = Math.floor(timerValue.current / 60000)
+            const seconds = (timerValue.current - minutes * 60000) / 1000
+
+            timerBlock.current.textContent = `${minutes < 10 ? `0${minutes}` : minutes}:${
+                seconds < 10 ? `0${seconds}` : seconds
+            }`
         }, 1000)
     }, [])
 
     const endGame = React.useCallback(() => {
-        clearInterval(timer)
+        clearInterval(timer.current)
+        timerValue.current = 0
     }, [])
 
     React.useEffect(() => {
@@ -42,16 +42,13 @@ function TimerComponent({ state }: timerProp) {
                 break
             case "start":
                 endGame()
-                setSecondValue((seconds.current = 0))
-                setMinuteValue((minute.current = 0))
+                timerBlock.current.innerText = `00:00`
         }
     }, [state])
 
     return (
         <div>
-            <p>
-                {minuteValue}:{secondValue}
-            </p>
+            <span ref={timerBlock} />
         </div>
     )
 }
