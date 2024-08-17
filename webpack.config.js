@@ -26,7 +26,7 @@ module.exports = () => {
                             loader: "sass-loader",
                             options: {
                                 sourceMap: true,
-                                additionalData: '@import "./src/Shared/Styles/_vars.sass";',
+                                additionalData: '@import "./src/Shared/Styles/_vars.sass"',
                             },
                         },
                     ],

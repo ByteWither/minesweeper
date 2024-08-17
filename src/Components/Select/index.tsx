@@ -1,4 +1,4 @@
-import React from "react"
+import "./index.sass"
 
 type value = string
 
@@ -13,12 +13,10 @@ type selectProps = {
     onChange?: (value: value) => void
 }
 
-function SelectComponent({ value = null, options = [], onChange = null }: selectProps) {
+export function Select({ value = null, options = [], onChange = null }: selectProps) {
     const changeHandler = (e: React.ChangeEvent<HTMLSelectElement>) => {
         if (onChange) onChange(e.target.value)
     }
-
-    require("./index.sass")
 
     return (
         <div className="select">
@@ -34,5 +32,3 @@ function SelectComponent({ value = null, options = [], onChange = null }: select
         </div>
     )
 }
-
-export const Select = React.memo(SelectComponent)

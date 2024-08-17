@@ -1,4 +1,5 @@
-import React from "react"
+import { memo } from "react"
+import "./index.sass"
 
 export type States = "flag" | "opened" | "bomb"
 type FieldProps = {
@@ -45,8 +46,6 @@ function FieldComponent({
     if (state === "bomb") className += " field--bomb"
     if (state === "opened") className += " field--opened"
 
-    require("./index.sass")
-
     return (
         <button className={className} onClick={leftClickHandle} onContextMenu={rightClickHandle}>
             {getState()}
@@ -54,4 +53,4 @@ function FieldComponent({
     )
 }
 
-export const Field = React.memo(FieldComponent)
+export const Field = memo(FieldComponent)

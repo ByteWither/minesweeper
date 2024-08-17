@@ -1,11 +1,11 @@
 import React from "react"
-import { FaceTypes } from "Components/Face"
+import { FaceTypes } from "@/Components/Face"
 
 type timerProp = {
     state: FaceTypes
 }
 
-function TimerComponent({ state }: timerProp) {
+export function Timer({ state }: timerProp) {
     const timerBlock = React.useRef<HTMLSpanElement>()
 
     const timer = React.useRef<number>(0)
@@ -52,5 +52,3 @@ function TimerComponent({ state }: timerProp) {
         </div>
     )
 }
-
-export const Timer = React.memo(TimerComponent)

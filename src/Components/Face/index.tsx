@@ -1,4 +1,4 @@
-import React from "react"
+import "./index.sass"
 
 export type FaceTypes = "lose" | "win" | "game" | "start"
 
@@ -19,8 +19,6 @@ type faceProps = {
 }
 
 export function Face({ state, onResetGame }: faceProps) {
-    require("./index.sass")
-
     const onClick = () => {
         onResetGame()
     }

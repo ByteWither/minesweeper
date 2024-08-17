@@ -1,9 +1,10 @@
-import React from "react"
-import ReactDOM from "react-dom"
-import { Board } from "Components/Board"
-import { Face, FaceTypes } from "Components/Face"
-import { Select } from "Components/Select"
-import { Timer } from "Components/Timer"
+import { StrictMode, useCallback, useRef, useState } from "react"
+import { createRoot } from "react-dom/client"
+import { Board } from "@/Components/Board"
+import { Face, FaceTypes } from "@/Components/Face"
+import { Select } from "@/Components/Select"
+import { Timer } from "@/Components/Timer"
+import "./index.sass"
 
 const DIFFICULTIES: Select = [
     { value: "easy", title: "Easy" },
@@ -12,27 +13,25 @@ const DIFFICULTIES: Select = [
 ]
 
 function App() {
-    const [diff, setDiff] = React.useState<string>("easy")
-    const [gameState, setGameState] = React.useState<FaceTypes>("start")
-    const gameResetFn = React.useRef<() => void>()
+    const [diff, setDiff] = useState<string>("easy")
+    const [gameState, setGameState] = useState<FaceTypes>("start")
+    const gameResetFn = useRef<() => void>()
 
-    const changeDifficulty = React.useCallback((value: string) => {
+    const changeDifficulty = useCallback((value: string) => {
         setDiff(value)
     }, [])
 
-    const changeEmoji = React.useCallback((value: FaceTypes) => {
+    const changeEmoji = useCallback((value: FaceTypes) => {
         setGameState(value)
     }, [])
 
-    const gameResetter = React.useCallback((resetter) => {
+    const gameResetter = useCallback((resetter) => {
         gameResetFn.current = resetter
     }, [])
 
     const resetHandler = () => {
         gameResetFn.current()
     }
-
-    require("./index.sass")
 
     return (
         <>
@@ -46,9 +45,8 @@ function App() {
     )
 }
 
-ReactDOM.render(
-    <React.StrictMode>
+createRoot(document.getElementById("root")).render(
+    <StrictMode>
         <App />
-    </React.StrictMode>,
-    document.getElementById("root"),
+    </StrictMode>,
 )

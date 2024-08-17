@@ -1,6 +1,6 @@
-import React from "react"
-import { Field, States } from "Components/Field"
-import { cloneDeep } from "lodash"
+import { memo, useCallback, useEffect, useRef, useState } from "react"
+import { Field, States } from "@/Components/Field"
+import "./index.sass"
 
 type boardItem = {
     isMine: boolean
@@ -97,14 +97,14 @@ type boardProps = {
 }
 
 function BoardComponent({ difficulty, onGameState, getReset = null }: boardProps) {
-    const firstStep = React.useRef<boolean>(true)
-    const [userBoard, setUserBoard] = React.useState<board>([])
+    const firstStep = useRef<boolean>(true)
+    const [userBoard, setUserBoard] = useState<board>([])
 
-    const rows = React.useRef<number>(9)
-    const cells = React.useRef<number>(9)
-    const minesCount = React.useRef<number>(10)
+    const rows = useRef<number>(9)
+    const cells = useRef<number>(9)
+    const minesCount = useRef<number>(10)
 
-    const countOpenCells = React.useRef(rows.current * cells.current - minesCount.current)
+    const countOpenCells = useRef(rows.current * cells.current - minesCount.current)
 
     const boardFill = () => {
         clearBoard()
@@ -125,7 +125,7 @@ function BoardComponent({ difficulty, onGameState, getReset = null }: boardProps
         setUserBoard(board)
     }
 
-    React.useEffect(() => {
+    useEffect(() => {
         switch (difficulty) {
             case "easy":
                 rows.current = 9
@@ -147,7 +147,7 @@ function BoardComponent({ difficulty, onGameState, getReset = null }: boardProps
         boardFill()
     }, [difficulty])
 
-    React.useEffect(() => {
+    useEffect(() => {
         if (userBoard.length) {
             if (userBoard.some((row) => row.some((cell) => cell.isMine && cell.opened))) {
                 onGameState("lose")
@@ -166,7 +166,7 @@ function BoardComponent({ difficulty, onGameState, getReset = null }: boardProps
         onGameState("start")
 
         setUserBoard((prevState) => {
-            const mutateBoard = cloneDeep(prevState)
+            const mutateBoard = structuredClone(prevState)
 
             mutateBoard.map((item) => {
                 item.map((cell) => {
@@ -181,7 +181,7 @@ function BoardComponent({ difficulty, onGameState, getReset = null }: boardProps
         })
     }
 
-    React.useEffect(() => {
+    useEffect(() => {
         if (getReset) getReset(clearBoard)
     }, [getReset])
 
@@ -208,7 +208,7 @@ function BoardComponent({ difficulty, onGameState, getReset = null }: boardProps
         minesCount.current = countMines
 
         setUserBoard((prevState) => {
-            const mutateBoard = cloneDeep(prevState)
+            const mutateBoard = structuredClone(prevState)
 
             minesData.forEach(([mineX, mineY]) => {
                 mutateBoard[mineX][mineY].isMine = true
@@ -223,7 +223,7 @@ function BoardComponent({ difficulty, onGameState, getReset = null }: boardProps
         })
     }
 
-    const leftHandle = React.useCallback((x: number, y: number) => {
+    const leftHandle = useCallback((x: number, y: number) => {
         if (firstStep.current) {
             setMines(x, y)
             onGameState("game")
@@ -232,7 +232,7 @@ function BoardComponent({ difficulty, onGameState, getReset = null }: boardProps
 
         setUserBoard((prevState) => {
             if (!prevState[x][y].opened && !prevState[x][y].flagged) {
-                const mutateBoard = cloneDeep(prevState)
+                const mutateBoard = structuredClone(prevState)
                 mutateBoard[x][y].opened = true
 
                 if (mutateBoard[x][y].isMine) {
@@ -248,10 +248,10 @@ function BoardComponent({ difficulty, onGameState, getReset = null }: boardProps
         })
     }, [])
 
-    const rightHandle = React.useCallback((x: number, y: number) => {
+    const rightHandle = useCallback((x: number, y: number) => {
         setUserBoard((prevState) => {
             if (!prevState[x][y].opened) {
-                const mutateBoard = cloneDeep(prevState)
+                const mutateBoard = structuredClone(prevState)
 
                 mutateBoard[x][y].flagged = !mutateBoard[x][y].flagged
 
@@ -284,8 +284,6 @@ function BoardComponent({ difficulty, onGameState, getReset = null }: boardProps
         return null
     }
 
-    require("./index.sass")
-
     return (
         <div className="board">
             {userBoard.map((cells, rowIndex) => (
@@ -308,4 +306,4 @@ function BoardComponent({ difficulty, onGameState, getReset = null }: boardProps
     )
 }
 
-export const Board = React.memo(BoardComponent)
+export const Board = memo(BoardComponent)
