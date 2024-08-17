@@ -1,21 +1,17 @@
+import { ChangeEventHandler } from "react"
 import "./index.sass"
 
-type value = string
+export type SelectOption = { value: string; title: string }
 
-export type Select = Array<{
-    value: value
-    title: string
-}>
-
-type selectProps = {
-    value: value
-    options: Select
-    onChange?: (value: value) => void
+interface SelectProps {
+    value: string
+    options: SelectOption[]
+    onChange: (value: string) => void
 }
 
-export function Select({ value = null, options = [], onChange = null }: selectProps) {
-    const changeHandler = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        if (onChange) onChange(e.target.value)
+export function Select({ value, options, onChange }: SelectProps) {
+    const changeHandler: ChangeEventHandler<HTMLSelectElement> = (event) => {
+        onChange(event.target.value)
     }
 
     return (
